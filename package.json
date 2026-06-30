@@ -2,10 +2,8 @@
   "name": "s-textpaste",
   "version": "1.0.0",
   "private": true,
-  "description": "Zero-trust E2E encrypted text sharing with triple-envelope PQ encryption",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
-    "deploy": "node scripts/setup-d1.js && wrangler deploy",
+    "build": "node scripts/setup-d1.js && cd frontend && npm install && npm run build",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "node worker/server.js"
   },

@@ -4,30 +4,47 @@ const fs = require('fs')
 const path = require('path')
 
 const toml = path.join(__dirname, '..', 'wrangler.toml')
-if (!fs.existsSync(toml)) { console.log('No wrangler.toml'); process.exit(0) }
-
 let config = fs.readFileSync(toml, 'utf-8')
 
-// If database_id is already set (not empty placeholder), skip
-if (config.includes('database_id = "') && !config.includes('database_id = ""')) {
-  console.log('database_id already set')
+// Skip if already has a real database_id
+if (/database_id\s*=\s*"[0-9a-f-]{20,}"/.test(config)) {
+  console.log('[setup-d1] database_id already set')
   process.exit(0)
 }
 
-// Try to get database_id from wrangler d1 list
-try {
-  const out = execSync('npx wrangler d1 list --json', { encoding: 'utf-8', timeout: 15000 })
-  const dbs = JSON.parse(out)
-  const target = (Array.isArray(dbs) ? dbs : dbs.result || []).find(
-    d => d.name === 's-textpaste-db' || d.name === 's-textpaste-text-db'
-  )
-  if (target && target.uuid) {
-    config = config.replace(/database_id = ""/, `database_id = "${target.uuid}"`)
-    fs.writeFileSync(toml, config)
-    console.log(`Set database_id = "${target.uuid}"`)
-  } else {
-    console.log('No D1 database found, keeping placeholder')
-  }
-} catch (e) {
-  console.log('Could not detect D1:', e.message)
+// Find wrangler binary
+const bins = [
+  './node_modules/.bin/wrangler',
+  'npx wrangler',
+  'wrangler'
+]
+
+let dbs = []
+for (const bin of bins) {
+  try {
+    const out = execSync(`${bin} d1 list --json 2>/dev/null`, { encoding: 'utf-8', timeout: 20000, stdio: ['pipe', 'pipe', 'ignore'] })
+    const parsed = JSON.parse(out)
+    dbs = Array.isArray(parsed) ? parsed : (parsed.result || parsed || [])
+    break
+  } catch { continue }
 }
+
+if (dbs.length === 0) {
+  console.log('[setup-d1] No D1 databases found, keeping empty database_id')
+  process.exit(0)
+}
+
+const target = dbs.find(d => d.name === 's-textpaste-db' || d.name === 's-textpaste-text-db')
+if (!target) {
+  console.log('[setup-d1] Database "s-textpaste-db" not found in list:', dbs.map(d => d.name))
+  process.exit(0)
+}
+
+const id = target.uuid
+config = config.replace(
+  /database_id\s*=\s*""/,
+  `database_id = "${id}"`
+)
+
+fs.writeFileSync(toml, config)
+console.log(`[setup-d1] Set database_id = "${id}"`)
