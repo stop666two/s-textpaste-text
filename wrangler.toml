@@ -1,4 +1,4 @@
-name = "s-textpaste"
+name = "s-textpaste-text"
 main = "src/index.ts"
 compatibility_date = "2025-06-30"
 compatibility_flags = ["nodejs_compat"]
