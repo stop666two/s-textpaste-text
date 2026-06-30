@@ -8,7 +8,23 @@
 
 ## 一键部署
 
-点击上方按钮，Cloudflare 自动完成全部配置，包括 D1 数据库创建。
+点击上方按钮或使用 GitHub Actions。
+
+### GitHub Actions 部署
+
+1. Fork 本仓库
+2. 在 Settings → Secrets and variables → Actions 中添加：
+   - `CLOUDFLARE_API_TOKEN` — Workers API Token
+   - `CLOUDFLARE_ACCOUNT_ID` — Cloudflare Account ID
+3. 在 `wrangler.toml` 中填入 D1 database_id
+4. Push 到 main 分支，自动部署
+
+### D1 数据库
+
+```bash
+npx wrangler d1 create s-textpaste-db
+# 将返回的 database_id 填入 wrangler.toml
+```
 
 ---
 
