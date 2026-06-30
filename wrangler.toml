@@ -3,10 +3,6 @@ main = "src/index.ts"
 compatibility_date = "2025-06-30"
 compatibility_flags = ["nodejs_compat"]
 
-[[d1_databases]]
-binding = "DB"
-database_name = "s-textpaste-db"
-
 [assets]
 directory = "frontend/dist"
 not_found_handling = "single-page-application"
