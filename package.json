@@ -4,11 +4,9 @@
   "private": true,
   "description": "Zero-trust E2E encrypted text sharing with triple-envelope PQ encryption",
   "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "node worker/server.js",
     "build": "cd frontend && npm install && npm run build",
-    "deploy": "npm run build && wrangler deploy",
-    "db:create": "wrangler d1 create s-textpaste-db"
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "node worker/server.js"
   },
   "dependencies": {
     "hono": "^4.6.12"
